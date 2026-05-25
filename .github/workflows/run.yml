@@ -1,0 +1,31 @@
+name: LinkedIn Post Workflow
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # Every day at 7:00am UTC
+  workflow_dispatch:        # Also allows manual trigger from GitHub Actions tab
+
+jobs:
+  run-workflow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150    # 2.5 hours max (covers the 2hr approval wait window)
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run LinkedIn workflow
+        env:
+          OPENAI_API_KEY:       ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_SHEETS_ID:     ${{ secrets.GOOGLE_SHEETS_ID }}
+          GOOGLE_CREDENTIALS:   ${{ secrets.GOOGLE_CREDENTIALS }}
+          GMAIL_ADDRESS:        ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD:   ${{ secrets.GMAIL_APP_PASSWORD }}
+          LINKEDIN_TOKEN:       ${{ secrets.LINKEDIN_TOKEN }}
+          LINKEDIN_PERSON_URN:  ${{ secrets.LINKEDIN_PERSON_URN }}
+        run: python workflow.py
