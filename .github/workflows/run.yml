@@ -21,7 +21,7 @@ jobs:
 
       - name: Run LinkedIn workflow
         env:
-          OPENAI_API_KEY:       ${{ secrets.OPENAI_API_KEY }}
+          OGEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
           GOOGLE_SHEETS_ID:     ${{ secrets.GOOGLE_SHEETS_ID }}
           GOOGLE_CREDENTIALS:   ${{ secrets.GOOGLE_CREDENTIALS }}
           GMAIL_ADDRESS:        ${{ secrets.GMAIL_ADDRESS }}
