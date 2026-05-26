@@ -41,12 +41,20 @@ SHEET_RANGE       = config.get("google_sheet_range", "Sheet1!A2:E")
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
-def http_post(url, data, headers):
+def http_post(url, data, headers, retries=3):
     body = json.dumps(data).encode()
-    req = urllib.request.Request(url, data=body, headers=headers, method="POST")
-    with urllib.request.urlopen(req) as r:
-        return json.loads(r.read())
-
+    for attempt in range(retries):
+        req = urllib.request.Request(url, data=body, headers=headers, method="POST")
+        try:
+            with urllib.request.urlopen(req) as r:
+                return json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            if e.code == 429 and attempt < retries - 1:
+                wait = 60 * (attempt + 1)  # wait 60s, then 120s
+                print(f"Rate limited. Waiting {wait}s before retry...")
+                time.sleep(wait)
+            else:
+                raise
 def http_get(url, headers):
     req = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(req) as r:
