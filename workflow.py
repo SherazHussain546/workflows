@@ -137,19 +137,12 @@ def generate_post(description, instructions, feedback=""):
         user_prompt += f"Feedback/Changes requested: {feedback}\n"
 
     data = {
-        "model": "gpt-4o-mini",
-        "max_tokens": 600,
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user",   "content": user_prompt}
-        ]
+        "contents": [{"parts": [{"text": system + "\n\n" + user_prompt}]}]
     }
-    headers = {
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    result = http_post("https://api.openai.com/v1/chat/completions", data, headers)
-    return result["choices"][0]["message"]["content"].strip()
+    headers = {"Content-Type": "application/json"}
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={os.environ['GEMINI_API_KEY']}"
+    result = http_post(url, data, headers)
+    return result["candidates"][0]["content"]["parts"][0]["text"].strip()
 
 # ── Step 4: Send approval email via Gmail ─────────────────────────────────────
 
